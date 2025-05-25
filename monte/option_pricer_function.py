@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import yfinance as yf
 
 
 def path_simulate(st,r,T,sigma,number_of_steps,number_of_paths):
@@ -42,12 +43,16 @@ def plot_paths(sum_paths, T):
 
 
 if __name__ == "__main__":
-    st=100
-    K=100
+    ticker = yf.Ticker("AAPL")
+    data = ticker.history(period="1y", interval="1d")
+    st=data["Close"][-1]
+    log_returns = np.log(data["Close"] / data["Close"].shift(1)).dropna()
+    daily_vol = np.std(log_returns)
+    sigma = daily_vol * np.sqrt(252)
+    K=st
     r=0.05
     T=1
     call_or_put='put'
-    sigma=0.2
     number_of_steps=252
     number_of_paths=100000
     sum_paths = path_simulate(st,r,T,sigma,number_of_steps,number_of_paths)
